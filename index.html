@@ -1,6 +1,255 @@
-<html>
-  <head>I am Colleague</head>
-  <body>
-    <h1>I am Colleague is for opensource projects in JavaScript, CSS and HTML</h1>
-  </body>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Calculator</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --panel:#111827;
+      --accent:#3b82f6;
+      --btn:#1f2937;
+      --btn-hover:#374151;
+      --text:#e6eef8;
+      --muted:#94a3b8;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(180deg,#071029 0%, #08203a 100%);
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      padding:24px;
+    }
+    .calculator{
+      width:360px;
+      max-width:100%;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:18px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6), inset 0 1px rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .display{
+      background:var(--panel);
+      border-radius:8px;
+      padding:12px 14px;
+      min-height:64px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      margin-bottom:12px;
+      word-break:break-all;
+    }
+    .expression{
+      color:var(--muted);
+      font-size:14px;
+      min-height:18px;
+    }
+    .result{
+      text-align:right;
+      font-size:28px;
+      font-weight:600;
+      margin-top:4px;
+      color:var(--text);
+      min-height:30px;
+    }
+    .keys{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+    }
+    button.key{
+      background:var(--btn);
+      border:0;
+      color:var(--text);
+      padding:16px;
+      border-radius:8px;
+      font-size:18px;
+      cursor:pointer;
+      transition:transform .05s ease, background .12s;
+      box-shadow: 0 4px 10px rgba(2,6,23,0.5);
+    }
+    button.key:hover{ background:var(--btn-hover); transform:translateY(-1px) }
+    button.key.operator{ background:linear-gradient(180deg, #0b63d8, #0450b8); color:#fff }
+    button.key.equals{
+      grid-column: span 2;
+      background:linear-gradient(180deg, var(--accent), #1e63d6);
+      font-weight:700;
+      font-size:18px;
+    }
+    button.key.clear{ background:linear-gradient(180deg,#ef4444,#dc2626); color:#fff }
+    button.key.zero{ grid-column: span 2; }
+    footer.note{
+      margin-top:12px;
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    @media (max-width:420px){
+      .calculator{ padding:12px }
+      .display{ padding:10px }
+      button.key{ padding:12px; font-size:16px }
+      .result{ font-size:24px }
+    }
+  </style>
+</head>
+<body>
+  <main class="calculator" aria-label="Simple calculator">
+    <section class="display" aria-live="polite" aria-atomic="true">
+      <div id="expression" class="expression" aria-hidden="true"></div>
+      <div id="result" class="result">0</div>
+    </section>
+
+    <section class="keys" role="group" aria-label="Calculator keys">
+      <button class="key clear" data-action="clear">C</button>
+      <button class="key" data-action="delete" title="Delete (Backspace)">DEL</button>
+      <button class="key" data-value="(">(</button>
+      <button class="key" data-value=")">)</button>
+
+      <button class="key" data-value="7">7</button>
+      <button class="key" data-value="8">8</button>
+      <button class="key" data-value="9">9</button>
+      <button class="key operator" data-value="÷">÷</button>
+
+      <button class="key" data-value="4">4</button>
+      <button class="key" data-value="5">5</button>
+      <button class="key" data-value="6">6</button>
+      <button class="key operator" data-value="×">×</button>
+
+      <button class="key" data-value="1">1</button>
+      <button class="key" data-value="2">2</button>
+      <button class="key" data-value="3">3</button>
+      <button class="key operator" data-value="-">−</button>
+
+      <button class="key zero" data-value="0">0</button>
+      <button class="key" data-value=".">.</button>
+      <button class="key operator" data-value="+">+</button>
+
+      <button class="key equals" data-action="equals">=</button>
+    </section>
+
+    <footer class="note">
+      Tip: Use keyboard numbers, + - * / or Enter / Backspace for equals/delete.
+    </footer>
+  </main>
+
+  <script>
+    (function(){
+      const expressionEl = document.getElementById('expression');
+      const resultEl = document.getElementById('result');
+      const keys = document.querySelectorAll('.key');
+
+      let expr = ''; // visible expression using × ÷ − etc.
+      const sanitizeMap = { '×':'*', '÷':'/', '−':'-' };
+
+      function updateDisplay(){
+        expressionEl.textContent = expr;
+        // Show evaluated result in smaller text; if invalid or empty show 0
+        try{
+          const sanitized = toEval(expr);
+          if(sanitized.trim() === '') {
+            resultEl.textContent = '0';
+            return;
+          }
+          const value = evaluateSafe(sanitized);
+          resultEl.textContent = String(value);
+        }catch(e){
+          resultEl.textContent = 'Error';
+        }
+      }
+
+      function toEval(s){
+        // Replace unicode operators with JS equivalents
+        return s.replace(/[×÷−]/g, m => sanitizeMap[m] || m);
+      }
+
+      function evaluateSafe(code){
+        // Accept only digits, operators, parentheses, decimal and spaces
+        if(!/^[0-9+\-*/().\s]+$/.test(code)) throw new Error('Invalid characters');
+        // Disallow sequences like "**" (exponent) and "//"
+        if(/\*\*|\/\/|[^0-9)\s][.][^0-9]/.test(code)) {
+          // allow normal decimal like 1.23; this naive check avoids obvious misuse
+        }
+        // Evaluate using Function to limit scope (basic calculator)
+        // This is acceptable for local static calculator UI. For extra safety, a math parser can be used.
+        // eslint-disable-next-line no-new-func
+        const fn = new Function('return (' + code + ')');
+        const res = fn();
+        if(typeof res === 'number' && !Number.isFinite(res)) throw new Error('Math error');
+        return Math.round((res + Number.EPSILON) * 1e12) / 1e12; // round to reasonable precision
+      }
+
+      function appendValue(v){
+        // Prevent multiple operators in a row (except allowing unary minus after '(')
+        const last = expr.slice(-1);
+        if(/[+\-×÷\u2212*/]/.test(last) && /[+\-×÷\u2212*/]/.test(v)){
+          // replace previous operator with new (except when '(')
+          expr = expr.slice(0,-1) + v;
+        } else {
+          expr += v;
+        }
+        updateDisplay();
+      }
+
+      function clearAll(){
+        expr = '';
+        updateDisplay();
+      }
+
+      function deleteLast(){
+        expr = expr.slice(0,-1);
+        updateDisplay();
+      }
+
+      function calculate(){
+        try{
+          const sanitized = toEval(expr);
+          const res = evaluateSafe(sanitized);
+          expr = String(res);
+          updateDisplay();
+        }catch(e){
+          resultEl.textContent = 'Error';
+        }
+      }
+
+      keys.forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const val = btn.getAttribute('data-value');
+          const action = btn.getAttribute('data-action');
+          if(action === 'clear'){ clearAll(); btn.blur(); return; }
+          if(action === 'delete'){ deleteLast(); btn.blur(); return; }
+          if(action === 'equals'){ calculate(); btn.blur(); return; }
+          if(val) appendValue(val);
+        });
+      });
+
+      // Keyboard support
+      window.addEventListener('keydown', (e)=>{
+        if(e.ctrlKey || e.metaKey) return;
+        const key = e.key;
+        if((/^[0-9]$/).test(key)){ appendValue(key); e.preventDefault(); return; }
+        if(key === '.') { appendValue('.'); e.preventDefault(); return; }
+        if(key === 'Enter' || key === '='){ calculate(); e.preventDefault(); return; }
+        if(key === 'Backspace'){ deleteLast(); e.preventDefault(); return; }
+        if(key === 'Escape'){ clearAll(); e.preventDefault(); return; }
+        // map standard operators to our display symbols (for consistency)
+        if(key === '*'){ appendValue('×'); e.preventDefault(); return; }
+        if(key === '/'){ appendValue('÷'); e.preventDefault(); return; }
+        if(key === '+'){ appendValue('+'); e.preventDefault(); return; }
+        if(key === '-') { appendValue('−'); e.preventDefault(); return; }
+        if(key === '(' || key === ')') { appendValue(key); e.preventDefault(); return; }
+      });
+
+      // Initialize
+      updateDisplay();
+    })();
+  </script>
+</body>
 </html>
