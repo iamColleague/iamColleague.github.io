@@ -1,159 +1,124 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>I'm Colleague</title>
-  <link rel="stylesheet" href="styles.css" />
-  <meta name="description" content="A simple startup landing page template built with HTML, CSS and JavaScript." />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Simple Calculator</title>
+  <style>
+    body {
+      background: #f1f1f1;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+    .calculator {
+      background: #222;
+      border-radius: 12px;
+      padding: 24px 16px 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    }
+    .display {
+      width: 100%;
+      height: 48px;
+      background: #111;
+      color: #fff;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      font-size: 1.8em;
+      padding: 0 12px;
+      justify-content: flex-end;
+      box-sizing: border-box;
+      overflow-x: auto;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 60px);
+      gap: 12px;
+      justify-content: center;
+    }
+    button {
+      height: 48px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      background: #444;
+      color: #fff;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    button.operator {background: #ff9500; color: #fff;}
+    button.equal {background: #3897f0; color: #fff;}
+    button.clear {background: #e74c3c;}
+    button:active {background: #333;}
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="#">I'm Colleague</a>
-
-      <nav class="nav" aria-label="Main navigation">
-        <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="navMenu">☰</button>
-        <ul id="navMenu" class="nav-menu">
-          <li><a href="#features">Features</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-          <li><a href="#contact">Contact</a></li>
-          <li><button id="ctaTop" class="btn btn-primary">Get Started</button></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero">
-      <div class="container hero-inner">
-        <div class="hero-text">
-          <h1>Build faster. Launch smarter.</h1>
-          <p class="lead">NovaStart gives your idea the simplest path from concept to users — beautiful landing, signup flow, and analytics-ready hooks.</p>
-          <div class="hero-ctas">
-            <button id="ctaMain" class="btn btn-primary">Get Started — it's free</button>
-            <a href="#features" class="btn btn-ghost">See features</a>
-          </div>
-        </div>
-
-        <div class="hero-card" aria-hidden="true">
-          <div class="card-mock">
-            <div class="mock-header"></div>
-            <div class="mock-body">
-              <div class="bar short"></div>
-              <div class="bar"></div>
-              <div class="bar half"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="features" class="features container">
-      <h2 class="section-title">Everything you need to launch</h2>
-      <div class="features-grid">
-        <article class="feature">
-          <h3>Fast setup</h3>
-          <p>Get a clean landing and signup flow ready in minutes with sensible defaults.</p>
-        </article>
-        <article class="feature">
-          <h3>Customizable</h3>
-          <p>Easily adapt styles and text to match your brand. No build step required.</p>
-        </article>
-        <article class="feature">
-          <h3>Lightweight</h3>
-          <p>Minimal JavaScript and CSS so performance stays great on any device.</p>
-        </article>
-      </div>
-    </section>
-
-    <section id="pricing" class="pricing">
-      <div class="container">
-        <h2 class="section-title">Pricing</h2>
-        <div class="pricing-grid">
-          <div class="price-card">
-            <h3>Hobby</h3>
-            <p class="price">$0 <span>/ month</span></p>
-            <ul>
-              <li>Single project</li>
-              <li>Email support</li>
-              <li>Basic analytics</li>
-            </ul>
-            <button class="btn btn-outline" data-plan="Hobby">Choose</button>
-          </div>
-
-          <div class="price-card popular">
-            <span class="badge">Popular</span>
-            <h3>Starter</h3>
-            <p class="price">$12 <span>/ month</span></p>
-            <ul>
-              <li>Multiple projects</li>
-              <li>Priority support</li>
-              <li>Advanced analytics</li>
-            </ul>
-            <button class="btn btn-primary" data-plan="Starter">Choose</button>
-          </div>
-
-          <div class="price-card">
-            <h3>Pro</h3>
-            <p class="price">$49 <span>/ month</span></p>
-            <ul>
-              <li>Team accounts</li>
-              <li>Dedicated support</li>
-              <li>Custom SLA</li>
-            </ul>
-            <button class="btn btn-outline" data-plan="Pro">Choose</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact" class="contact container">
-      <h2 class="section-title">Contact</h2>
-      <p>If you want help customizing this template, drop us a message.</p>
-      <form id="contactForm" class="contact-form" novalidate>
-        <div class="form-row">
-          <input id="name" name="name" type="text" placeholder="Your name" required />
-          <input id="email" name="email" type="email" placeholder="you@company.com" required />
-        </div>
-        <textarea id="message" name="message" rows="4" placeholder="How can we help?" required></textarea>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Send message</button>
-        </div>
-      </form>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div>© <span id="year"></span> NovaStart</div>
-      <div class="footer-links">
-        <a href="#" aria-label="Terms">Terms</a>
-        <a href="#" aria-label="Privacy">Privacy</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Signup Modal -->
-  <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal-backdrop" id="modalBackdrop"></div>
-    <div class="modal-panel" role="document">
-      <button id="modalClose" class="modal-close" aria-label="Close">✕</button>
-      <h3>Start your free trial</h3>
-      <p>Enter your details and we'll set you up immediately.</p>
-      <form id="signupForm" class="signup-form" novalidate>
-        <input id="signupName" name="signupName" type="text" placeholder="Full name" required />
-        <input id="signupEmail" name="signupEmail" type="email" placeholder="Email address" required />
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Create account</button>
-        </div>
-        <p class="small">We store only the name and email locally for demo purposes.</p>
-      </form>
+  <div class="calculator">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+      <button class="clear" onclick="clearDisplay()">C</button>
+      <button onclick="append('(')">(</button>
+      <button onclick="append(')')">)</button>
+      <button class="operator" onclick="append('/')">/</button>
+      <button onclick="append('7')">7</button>
+      <button onclick="append('8')">8</button>
+      <button onclick="append('9')">9</button>
+      <button class="operator" onclick="append('*')">&times;</button>
+      <button onclick="append('4')">4</button>
+      <button onclick="append('5')">5</button>
+      <button onclick="append('6')">6</button>
+      <button class="operator" onclick="append('-')">-</button>
+      <button onclick="append('1')">1</button>
+      <button onclick="append('2')">2</button>
+      <button onclick="append('3')">3</button>
+      <button class="operator" onclick="append('+')">+</button>
+      <button onclick="append('0')">0</button>
+      <button onclick="append('.')">.</button>
+      <button onclick="deleteLast()">⌫</button>
+      <button class="equal" onclick="calculate()">=</button>
     </div>
   </div>
+  <script>
+    const display = document.getElementById('display');
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    function append(char) {
+      if (display.textContent === '0' || display.textContent === 'Error') {
+        display.textContent = char;
+      } else {
+        display.textContent += char;
+      }
+    }
 
-  <script src="script.js"></script>
+    function clearDisplay() {
+      display.textContent = '0';
+    }
+
+    function deleteLast() {
+      if (display.textContent.length === 1 || display.textContent === 'Error') {
+        display.textContent = '0';
+      } else {
+        display.textContent = display.textContent.slice(0, -1);
+      }
+    }
+
+    function calculate() {
+      try {
+        // Do not allow eval injection
+        // Only basic arithmetic allowed (parens, numbers, + - * / .)
+        if (/[^0-9+\-*/(). ]/.test(display.textContent)) {
+          throw 'Invalid input';
+        }
+        // Evaluate
+        // eslint-disable-next-line no-eval
+        let result = eval(display.textContent);
+        display.textContent = result;
+      } catch {
+        display.textContent = 'Error';
+      }
+    }
+  </script>
 </body>
 </html>
