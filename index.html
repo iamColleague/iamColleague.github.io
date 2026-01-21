@@ -1,124 +1,67 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Simple Calculator</title>
-  <style>
-    body {
-      background: #f1f1f1;
-      display: flex;
-      height: 100vh;
-      justify-content: center;
-      align-items: center;
-    }
-    .calculator {
-      background: #222;
-      border-radius: 12px;
-      padding: 24px 16px 16px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-    }
-    .display {
-      width: 100%;
-      height: 48px;
-      background: #111;
-      color: #fff;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      font-size: 1.8em;
-      padding: 0 12px;
-      justify-content: flex-end;
-      box-sizing: border-box;
-      overflow-x: auto;
-    }
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 60px);
-      gap: 12px;
-      justify-content: center;
-    }
-    button {
-      height: 48px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1em;
-      background: #444;
-      color: #fff;
-      transition: background 0.2s;
-      cursor: pointer;
-    }
-    button.operator {background: #ff9500; color: #fff;}
-    button.equal {background: #3897f0; color: #fff;}
-    button.clear {background: #e74c3c;}
-    button:active {background: #333;}
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple CRUD Blog</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="calculator">
-    <div class="display" id="display">0</div>
-    <div class="buttons">
-      <button class="clear" onclick="clearDisplay()">C</button>
-      <button onclick="append('(')">(</button>
-      <button onclick="append(')')">)</button>
-      <button class="operator" onclick="append('/')">/</button>
-      <button onclick="append('7')">7</button>
-      <button onclick="append('8')">8</button>
-      <button onclick="append('9')">9</button>
-      <button class="operator" onclick="append('*')">&times;</button>
-      <button onclick="append('4')">4</button>
-      <button onclick="append('5')">5</button>
-      <button onclick="append('6')">6</button>
-      <button class="operator" onclick="append('-')">-</button>
-      <button onclick="append('1')">1</button>
-      <button onclick="append('2')">2</button>
-      <button onclick="append('3')">3</button>
-      <button class="operator" onclick="append('+')">+</button>
-      <button onclick="append('0')">0</button>
-      <button onclick="append('.')">.</button>
-      <button onclick="deleteLast()">⌫</button>
-      <button class="equal" onclick="calculate()">=</button>
+  <header>
+    <h1>Simple CRUD Blog</h1>
+    <div class="header-actions">
+      <input id="search" type="search" placeholder="Search posts..." />
+      <button id="new-post-btn">New Post</button>
+      <button id="clear-all-btn" title="Remove all posts">Clear All</button>
     </div>
-  </div>
-  <script>
-    const display = document.getElementById('display');
+  </header>
 
-    function append(char) {
-      if (display.textContent === '0' || display.textContent === 'Error') {
-        display.textContent = char;
-      } else {
-        display.textContent += char;
-      }
-    }
+  <main>
+    <section id="list-section" class="card">
+      <h2>Posts</h2>
+      <ul id="posts-list" class="posts-list"></ul>
+      <p id="no-posts" class="muted">No posts yet — create your first one.</p>
+    </section>
 
-    function clearDisplay() {
-      display.textContent = '0';
-    }
+    <section id="form-section" class="card hidden">
+      <h2 id="form-title">New Post</h2>
+      <form id="post-form">
+        <input id="post-id" type="hidden" />
+        <label>
+          Title
+          <input id="title" name="title" required maxlength="120" />
+        </label>
+        <label>
+          Content
+          <textarea id="content" name="content" required rows="8"></textarea>
+        </label>
+        <div class="form-actions">
+          <button type="submit" id="save-btn">Save</button>
+          <button type="button" id="cancel-btn" class="secondary">Cancel</button>
+        </div>
+      </form>
+    </section>
 
-    function deleteLast() {
-      if (display.textContent.length === 1 || display.textContent === 'Error') {
-        display.textContent = '0';
-      } else {
-        display.textContent = display.textContent.slice(0, -1);
-      }
-    }
+    <section id="view-section" class="card hidden">
+      <header class="view-header">
+        <h2 id="view-title"></h2>
+        <div class="view-meta">
+          <span id="view-dates"></span>
+        </div>
+      </header>
+      <article id="view-content" class="post-content"></article>
+      <div class="view-actions">
+        <button id="edit-btn">Edit</button>
+        <button id="delete-btn" class="danger">Delete</button>
+        <button id="back-btn" class="secondary">Back</button>
+      </div>
+    </section>
+  </main>
 
-    function calculate() {
-      try {
-        // Do not allow eval injection
-        // Only basic arithmetic allowed (parens, numbers, + - * / .)
-        if (/[^0-9+\-*/(). ]/.test(display.textContent)) {
-          throw 'Invalid input';
-        }
-        // Evaluate
-        // eslint-disable-next-line no-eval
-        let result = eval(display.textContent);
-        display.textContent = result;
-      } catch {
-        display.textContent = 'Error';
-      }
-    }
-  </script>
+  <footer>
+    <small>Posts are stored locally in your browser (localStorage).</small>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
