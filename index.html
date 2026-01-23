@@ -1,67 +1,758 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simple CRUD Blog</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colorful Search Engine + Submit URL (1 File)</title>
+  <style>
+    * { box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0ea5e9, #8b5cf6, #f97316);
+      min-height: 100vh;
+      color: #0b1020;
+    }
+
+    .page{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 14px 60px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:16px 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .logo{
+      width:44px;
+      height:44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg,#22c55e,#3b82f6,#a855f7);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-weight:900;
+      letter-spacing:0.5px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+    }
+
+    .brand-title b{
+      font-size:16px;
+      color:#08112a;
+    }
+    .brand-title span{
+      display:block;
+      font-size:12px;
+      color:#3b4a6b;
+      margin-top:3px;
+    }
+
+    .badge{
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #0b1020;
+      color:#fff;
+      font-size: 12px;
+      font-weight: bold;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 280px 1fr;
+      gap:16px;
+      margin-top: 16px;
+    }
+
+    @media(max-width: 950px){
+      .layout{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.14);
+    }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .section-title h2{
+      margin:0;
+      font-size: 14px;
+      color:#0b1020;
+    }
+    .hint{
+      font-size:12px;
+      color:#4b5c84;
+    }
+
+    /* Inputs */
+    input, textarea{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(9, 20, 50, 0.12);
+      background: rgba(255,255,255,0.95);
+      outline:none;
+      font-size: 14px;
+    }
+    input:focus, textarea:focus{
+      border-color: rgba(59,130,246,0.8);
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.18);
+    }
+    textarea{
+      resize: vertical;
+      min-height: 92px;
+    }
+
+    /* Buttons */
+    button{
+      border: none;
+      cursor: pointer;
+      padding: 11px 12px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 13px;
+      color:#fff;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.12);
+      transition: transform 0.08s ease, opacity 0.2s ease;
+    }
+    button:active{ transform: translateY(1px); }
+    button:hover{ opacity: 0.92; }
+
+    .btn-blue{ background: linear-gradient(135deg,#3b82f6,#06b6d4); }
+    .btn-green{ background: linear-gradient(135deg,#22c55e,#16a34a); }
+    .btn-purple{ background: linear-gradient(135deg,#a855f7,#7c3aed); }
+    .btn-orange{ background: linear-gradient(135deg,#fb923c,#f97316); }
+    .btn-red{ background: linear-gradient(135deg,#ef4444,#dc2626); }
+    .btn-dark{ background: linear-gradient(135deg,#111827,#0b1020); }
+
+    /* Search row */
+    .search-row{
+      display:grid;
+      grid-template-columns: 1fr auto auto auto auto;
+      gap:10px;
+      align-items:center;
+    }
+    @media(max-width: 760px){
+      .search-row{ grid-template-columns: 1fr 1fr; }
+      .search-row button{ width:100%; }
+    }
+
+    .meta{
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(11,16,32,0.06);
+      color:#27355a;
+      font-size: 13px;
+    }
+
+    /* Tag chips */
+    .tag-list{
+      display:flex;
+      flex-wrap: wrap;
+      gap:8px;
+      margin-top: 10px;
+    }
+    .chip{
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(0,0,0,0.08);
+      font-size: 12px;
+      font-weight: bold;
+      color:#0b1020;
+      user-select:none;
+    }
+    .chip.active{
+      color:#fff;
+      background: linear-gradient(135deg,#3b82f6,#a855f7);
+      border-color: transparent;
+    }
+
+    /* Results */
+    .results{
+      margin-top: 12px;
+      display:grid;
+      gap: 12px;
+    }
+    .result{
+      background: rgba(255,255,255,0.96);
+      border-radius: 18px;
+      padding: 14px;
+      border: 1px solid rgba(11,16,32,0.08);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.10);
+    }
+    .url{
+      font-size: 12px;
+      color:#5b6a90;
+      margin-bottom: 6px;
+      word-break: break-all;
+    }
+    .title{
+      margin: 0 0 6px;
+      font-size: 17px;
+      color:#0b1020;
+    }
+    .title a{
+      color:#0b1020;
+      text-decoration:none;
+    }
+    .title a:hover{ text-decoration: underline; }
+    .desc{
+      margin:0;
+      font-size: 13px;
+      line-height: 1.45;
+      color:#334466;
+    }
+    .tag-row{
+      margin-top: 10px;
+      display:flex;
+      gap:6px;
+      flex-wrap: wrap;
+    }
+    .tag{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(59,130,246,0.10);
+      color:#1d4ed8;
+      border: 1px solid rgba(59,130,246,0.18);
+      font-weight: bold;
+    }
+
+    .highlight{
+      background: #ffe066;
+      border-radius: 6px;
+      padding: 0 3px;
+    }
+
+    /* Pager */
+    .pager{
+      margin-top: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.88);
+      border: 1px solid rgba(0,0,0,0.07);
+    }
+    .pager-info{
+      font-size: 13px;
+      font-weight: bold;
+      color:#0b1020;
+    }
+
+    /* Submit form */
+    .form{
+      display:grid;
+      gap:10px;
+      margin-top: 10px;
+    }
+    .actions{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .note{
+      margin-top: 10px;
+      font-size: 12px;
+      color:#31406a;
+      background: rgba(11,16,32,0.06);
+      padding: 12px;
+      border-radius: 16px;
+    }
+
+    .file-input{
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .file-input b{ color:#0b1020; }
+    .file-input .small{ font-size:12px; color:#4b5c84; margin-top:6px; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Simple CRUD Blog</h1>
-    <div class="header-actions">
-      <input id="search" type="search" placeholder="Search posts..." />
-      <button id="new-post-btn">New Post</button>
-      <button id="clear-all-btn" title="Remove all posts">Clear All</button>
-    </div>
-  </header>
+  <div class="page">
 
-  <main>
-    <section id="list-section" class="card">
-      <h2>Posts</h2>
-      <ul id="posts-list" class="posts-list"></ul>
-      <p id="no-posts" class="muted">No posts yet — create your first one.</p>
-    </section>
-
-    <section id="form-section" class="card hidden">
-      <h2 id="form-title">New Post</h2>
-      <form id="post-form">
-        <input id="post-id" type="hidden" />
-        <label>
-          Title
-          <input id="title" name="title" required maxlength="120" />
-        </label>
-        <label>
-          Content
-          <textarea id="content" name="content" required rows="8"></textarea>
-        </label>
-        <div class="form-actions">
-          <button type="submit" id="save-btn">Save</button>
-          <button type="button" id="cancel-btn" class="secondary">Cancel</button>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">SE</div>
+        <div class="brand-title">
+          <b>Colorful Search Engine</b>
+          <span>Search + Submit URL + Tags + Import/Export (1 File)</span>
         </div>
-      </form>
-    </section>
-
-    <section id="view-section" class="card hidden">
-      <header class="view-header">
-        <h2 id="view-title"></h2>
-        <div class="view-meta">
-          <span id="view-dates"></span>
-        </div>
-      </header>
-      <article id="view-content" class="post-content"></article>
-      <div class="view-actions">
-        <button id="edit-btn">Edit</button>
-        <button id="delete-btn" class="danger">Delete</button>
-        <button id="back-btn" class="secondary">Back</button>
       </div>
-    </section>
-  </main>
+      <div class="badge">NO LOGIN ✅</div>
+    </div>
 
-  <footer>
-    <small>Posts are stored locally in your browser (localStorage).</small>
-  </footer>
+    <div class="layout">
+      <!-- Sidebar -->
+      <div class="card">
+        <div class="section-title">
+          <h2>Filters</h2>
+          <div class="hint">By Tag</div>
+        </div>
 
-  <script src="app.js"></script>
+        <div class="meta">Click a tag to filter your results.</div>
+
+        <div class="tag-list" id="tagList"></div>
+
+        <div class="note">
+          Tip: Use <b>ALL</b> to remove filter.
+        </div>
+      </div>
+
+      <!-- Main -->
+      <div class="card">
+        <div class="section-title">
+          <h2>Search</h2>
+          <div class="hint">Enter keyword → Enter</div>
+        </div>
+
+        <div class="search-row">
+          <input id="query" placeholder="Search..." />
+          <button class="btn-blue" id="searchBtn">SEARCH</button>
+          <button class="btn-purple" id="luckyBtn">LUCKY</button>
+          <button class="btn-green" id="randomBtn">RANDOM</button>
+          <button class="btn-red" id="clearBtn">CLEAR</button>
+        </div>
+
+        <div class="meta" id="metaText">
+          Search something. Use <b>LUCKY</b> to open top result.
+        </div>
+
+        <div class="results" id="results"></div>
+
+        <div class="pager" id="pager" style="display:none;">
+          <button class="btn-dark" id="prevBtn">PREV</button>
+          <div class="pager-info" id="pageInfo">Page 1 / 1</div>
+          <button class="btn-dark" id="nextBtn">NEXT</button>
+        </div>
+
+        <div style="height:14px;"></div>
+
+        <div class="section-title">
+          <h2>Submit URL</h2>
+          <div class="hint">Add your links</div>
+        </div>
+
+        <div class="form">
+          <input id="titleInput" placeholder="Title" />
+          <input id="urlInput" placeholder="URL (https://...)" />
+          <textarea id="descInput" placeholder="Description..."></textarea>
+          <input id="tagsInput" placeholder="Tags (comma separated)" />
+
+          <div class="actions">
+            <button class="btn-orange" id="submitBtn">SUBMIT</button>
+            <button class="btn-red" id="resetBtn">RESET ALL</button>
+            <button class="btn-blue" id="exportBtn">EXPORT JSON</button>
+          </div>
+
+          <div class="file-input">
+            <b>Import JSON</b>
+            <div class="small">Upload JSON (array of objects: title,url,description,tags)</div>
+            <input id="importFile" type="file" accept=".json" />
+          </div>
+
+          <div class="note">
+            Saved in browser using <b>localStorage</b>. (Stays after refresh)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const STORAGE_KEY = "colorful_search_engine_urls_v1";
+
+  const DEFAULT_PAGES = [
+    {
+      title: "HTML Tutorial",
+      url: "https://developer.mozilla.org/en-US/docs/Web/HTML",
+      description: "Learn HTML structure, tags, headings, paragraphs, links and images.",
+      tags: ["html", "web", "beginner"]
+    },
+    {
+      title: "CSS Tutorial",
+      url: "https://developer.mozilla.org/en-US/docs/Web/CSS",
+      description: "Learn CSS styling, flexbox, grid, responsive UI and animations.",
+      tags: ["css", "design", "ui"]
+    },
+    {
+      title: "JavaScript Guide",
+      url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+      description: "Learn JavaScript DOM, functions, events and projects.",
+      tags: ["javascript", "web", "programming"]
+    }
+  ];
+
+  // UI refs
+  const queryInput = document.getElementById("query");
+  const searchBtn = document.getElementById("searchBtn");
+  const luckyBtn = document.getElementById("luckyBtn");
+  const randomBtn = document.getElementById("randomBtn");
+  const clearBtn = document.getElementById("clearBtn");
+
+  const metaText = document.getElementById("metaText");
+  const resultsDiv = document.getElementById("results");
+  const tagList = document.getElementById("tagList");
+
+  const pager = document.getElementById("pager");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const pageInfo = document.getElementById("pageInfo");
+
+  const titleInput = document.getElementById("titleInput");
+  const urlInput = document.getElementById("urlInput");
+  const descInput = document.getElementById("descInput");
+  const tagsInput = document.getElementById("tagsInput");
+
+  const submitBtn = document.getElementById("submitBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const exportBtn = document.getElementById("exportBtn");
+  const importFile = document.getElementById("importFile");
+
+  // State
+  let PAGES = [];
+  let lastResults = [];
+  let activeTag = "all";
+  let currentPage = 1;
+  const perPage = 4;
+
+  function isValidUrl(url) {
+    try { new URL(url); return true; } catch { return false; }
+  }
+
+  function loadPages() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return [...DEFAULT_PAGES];
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [...DEFAULT_PAGES];
+    } catch {
+      return [...DEFAULT_PAGES];
+    }
+  }
+
+  function savePages() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(PAGES));
+  }
+
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>"']/g, (m) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[m]));
+  }
+
+  function highlight(text, q) {
+    if (!q) return escapeHTML(text);
+    const safe = escapeHTML(text);
+    const escapedQuery = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escapedQuery})`, "gi");
+    return safe.replace(regex, `<span class="highlight">$1</span>`);
+  }
+
+  function score(item, q) {
+    const query = q.toLowerCase();
+    let s = 0;
+
+    const title = (item.title || "").toLowerCase();
+    const desc = (item.description || "").toLowerCase();
+    const tags = (item.tags || []).join(" ").toLowerCase();
+
+    if (title.includes(query)) s += 10;
+    if (title.startsWith(query)) s += 5;
+    if (tags.includes(query)) s += 8;
+    if (desc.includes(query)) s += 4;
+
+    return s;
+  }
+
+  function makeSnippet(text, q) {
+    const content = text || "";
+    const lower = content.toLowerCase();
+    const query = q.toLowerCase();
+    const i = lower.indexOf(query);
+
+    if (i === -1) return content.length > 120 ? content.slice(0, 120) + "..." : content;
+
+    const start = Math.max(0, i - 35);
+    const end = Math.min(content.length, i + 85);
+    let snippet = content.slice(start, end);
+    if (start > 0) snippet = "..." + snippet;
+    if (end < content.length) snippet = snippet + "...";
+    return snippet;
+  }
+
+  function getAllTags() {
+    const tags = new Set(["all"]);
+    PAGES.forEach(p => (p.tags || []).forEach(t => tags.add(String(t).toLowerCase())));
+    return [...tags];
+  }
+
+  function renderTags() {
+    tagList.innerHTML = "";
+    getAllTags().forEach(t => {
+      const chip = document.createElement("div");
+      chip.className = "chip" + (activeTag === t ? " active" : "");
+      chip.textContent = t.toUpperCase();
+      chip.onclick = () => {
+        activeTag = t;
+        currentPage = 1;
+        runSearch(queryInput.value);
+        renderTags();
+      };
+      tagList.appendChild(chip);
+    });
+  }
+
+  function applyTagFilter(items) {
+    if (activeTag === "all") return items;
+    return items.filter(p => (p.tags || []).map(x => String(x).toLowerCase()).includes(activeTag));
+  }
+
+  function renderResults(found, query) {
+    resultsDiv.innerHTML = "";
+
+    if (!query.trim()) {
+      metaText.innerHTML = `Search something. Use <b>LUCKY</b> to open top result.`;
+      resultsDiv.innerHTML = `<div class="result">No results yet. Start searching 👆</div>`;
+      pager.style.display = "none";
+      return;
+    }
+
+    metaText.textContent = `${found.length} result(s) for "${query}" | Tag: ${activeTag.toUpperCase()}`;
+
+    if (found.length === 0) {
+      resultsDiv.innerHTML = `<div class="result">No results found. Try another keyword.</div>`;
+      pager.style.display = "none";
+      return;
+    }
+
+    const totalPages = Math.ceil(found.length / perPage);
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * perPage;
+    const pageItems = found.slice(start, start + perPage);
+
+    pager.style.display = "flex";
+    prevBtn.disabled = currentPage <= 1;
+    nextBtn.disabled = currentPage >= totalPages;
+    pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
+
+    pageItems.forEach(item => {
+      const snippet = makeSnippet(item.description, query);
+      const div = document.createElement("div");
+      div.className = "result";
+      div.innerHTML = `
+        <div class="url">${escapeHTML(item.url)}</div>
+        <h3 class="title">
+          <a href="${item.url}" target="_blank">${highlight(item.title, query)}</a>
+        </h3>
+        <p class="desc">${highlight(snippet, query)}</p>
+        <div class="tag-row">
+          ${(item.tags || []).map(t => `<span class="tag">${escapeHTML(String(t))}</span>`).join("")}
+        </div>
+      `;
+      resultsDiv.appendChild(div);
+    });
+  }
+
+  function runSearch(q) {
+    const query = q.trim();
+    lastResults = [];
+
+    if (!query) {
+      renderResults([], "");
+      return;
+    }
+
+    const found = applyTagFilter(PAGES)
+      .map(p => ({ ...p, _score: score(p, query) }))
+      .filter(p => p._score > 0)
+      .sort((a, b) => b._score - a._score);
+
+    lastResults = found;
+    renderResults(found, query);
+  }
+
+  function openLucky() {
+    if (lastResults.length === 0) return alert("Search first for Lucky!");
+    window.open(lastResults[0].url, "_blank");
+  }
+
+  function openRandom() {
+    const pool = lastResults.length > 0 ? lastResults : applyTagFilter(PAGES);
+    if (pool.length === 0) return alert("No URLs available!");
+    const r = Math.floor(Math.random() * pool.length);
+    window.open(pool[r].url, "_blank");
+  }
+
+  function submitURL() {
+    const title = titleInput.value.trim();
+    const url = urlInput.value.trim();
+    const description = descInput.value.trim();
+    const tagsRaw = tagsInput.value.trim();
+
+    if (!title || !url || !description) return alert("Fill Title, URL and Description.");
+    if (!isValidUrl(url)) return alert("Invalid URL. Example: https://example.com");
+
+    const tags = tagsRaw
+      ? tagsRaw.split(",").map(t => t.trim().toLowerCase()).filter(Boolean)
+      : [];
+
+    const already = PAGES.some(p => p.url.toLowerCase() === url.toLowerCase());
+    if (already) return alert("This URL already exists!");
+
+    PAGES.unshift({ title, url, description, tags });
+    savePages();
+
+    titleInput.value = "";
+    urlInput.value = "";
+    descInput.value = "";
+    tagsInput.value = "";
+
+    renderTags();
+    currentPage = 1;
+    runSearch(queryInput.value || title);
+    alert("Submitted ✅");
+  }
+
+  function resetAll() {
+    const ok = confirm("Delete all saved URLs?");
+    if (!ok) return;
+
+    PAGES = [...DEFAULT_PAGES];
+    savePages();
+    activeTag = "all";
+    currentPage = 1;
+    lastResults = [];
+
+    renderTags();
+    runSearch("");
+    alert("Reset done ✅");
+  }
+
+  function exportJSON() {
+    const blob = new Blob([JSON.stringify(PAGES, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "urls.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function importJSON(file) {
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!Array.isArray(data)) return alert("Invalid JSON: expected array.");
+
+      const cleaned = data
+        .filter(x => x && x.title && x.url && x.description)
+        .map(x => ({
+          title: String(x.title).trim(),
+          url: String(x.url).trim(),
+          description: String(x.description).trim(),
+          tags: Array.isArray(x.tags)
+            ? x.tags.map(t => String(t).toLowerCase().trim()).filter(Boolean)
+            : []
+        }))
+        .filter(x => isValidUrl(x.url));
+
+      const existing = new Set(PAGES.map(p => p.url.toLowerCase()));
+      cleaned.forEach(item => {
+        if (!existing.has(item.url.toLowerCase())) {
+          PAGES.unshift(item);
+          existing.add(item.url.toLowerCase());
+        }
+      });
+
+      savePages();
+      renderTags();
+      currentPage = 1;
+      runSearch(queryInput.value);
+      alert("Import complete ✅");
+    } catch {
+      alert("Import failed.");
+    }
+  }
+
+  // Events
+  searchBtn.addEventListener("click", () => { currentPage = 1; runSearch(queryInput.value); });
+  queryInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { currentPage = 1; runSearch(queryInput.value); }
+  });
+
+  luckyBtn.addEventListener("click", openLucky);
+  randomBtn.addEventListener("click", openRandom);
+
+  clearBtn.addEventListener("click", () => {
+    queryInput.value = "";
+    queryInput.focus();
+    currentPage = 1;
+    lastResults = [];
+    runSearch("");
+  });
+
+  prevBtn.addEventListener("click", () => {
+    currentPage--;
+    runSearch(queryInput.value);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    currentPage++;
+    runSearch(queryInput.value);
+  });
+
+  submitBtn.addEventListener("click", submitURL);
+  resetBtn.addEventListener("click", resetAll);
+  exportBtn.addEventListener("click", exportJSON);
+
+  importFile.addEventListener("change", (e) => {
+    const file = e.target.files?.[0];
+    if (file) importJSON(file);
+    e.target.value = "";
+  });
+
+  // Init
+  PAGES = loadPages();
+  renderTags();
+  runSearch("");
+</script>
 </body>
 </html>
