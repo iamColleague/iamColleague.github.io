@@ -63,46 +63,54 @@
 </div>
 
 <script>
-  const dictionary = {
-    responsible: {
-      en: "Having a duty or job to do",
-      hi: "जिम्मेदारी वाला"
-    },
-    handled: {
-      en: "Managed or dealt with",
-      hi: "संभाला"
-    },
-    improved: {
-      en: "Made something better",
-      hi: "सुधार किया"
-    },
-    confident: {
-      en: "Sure of yourself",
-      hi: "आत्मविश्वासी"
+  async function fetchEnglishMeaning(word) {
+    try {
+      const res = await fetch(
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+      );
+      const data = await res.json();
+      return data[0]?.meanings[0]?.definitions[0]?.definition
+        || "Meaning not found";
+    } catch {
+      return "Meaning not found";
     }
-  };
+  }
+
+  async function fetchHindiMeaning(word) {
+    try {
+      const res = await fetch(
+        `https://api.mymemory.translated.net/get?q=${word}&langpair=en|hi`
+      );
+      const data = await res.json();
+      return data.responseData.translatedText || "अर्थ नहीं मिला";
+    } catch {
+      return "अर्थ नहीं मिला";
+    }
+  }
 
   function getWords() {
     return JSON.parse(localStorage.getItem("words")) || [];
   }
 
-  function saveWord() {
+  async function saveWord() {
     const input = document.getElementById("wordInput");
     const word = input.value.toLowerCase().trim();
     if (!word) return;
 
     const words = getWords();
+    if (words.find(w => w.word === word)) return;
 
-    if (!words.find(w => w.word === word)) {
-      words.push({
-        word,
-        en: dictionary[word]?.en || "Meaning will come with practice",
-        hi: dictionary[word]?.hi || "अर्थ अभ्यास से आएगा",
-        savedAt: Date.now()
-      });
-      localStorage.setItem("words", JSON.stringify(words));
-    }
+    const en = await fetchEnglishMeaning(word);
+    const hi = await fetchHindiMeaning(word);
 
+    words.push({
+      word,
+      en,
+      hi,
+      savedAt: Date.now()
+    });
+
+    localStorage.setItem("words", JSON.stringify(words));
     input.value = "";
     renderWords();
   }
@@ -124,6 +132,7 @@
 
   renderWords();
 </script>
+
 
 </body>
 </html>
