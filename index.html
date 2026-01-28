@@ -2,78 +2,39 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Colleague</title>
+<title>Colleague v2.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f2f2f2;
-  margin: 0;
-  padding: 15px;
-}
-.app {
-  max-width: 600px;
-  margin: auto;
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-}
-h1, h2 { text-align: center; }
-select, input, button {
-  width: 100%;
-  padding: 8px;
-  margin: 6px 0;
-}
-button {
-  background: black;
-  color: white;
-  border: none;
-}
-li {
-  list-style: none;
-  border-bottom: 1px solid #ddd;
-  padding: 8px 0;
-}
-.small { font-size: 13px; color: #555; }
-.card {
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin: 10px 0;
-}
-#revisionBox { display:none; background:#fafafa; padding:10px; }
+body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:16px}
+.app{max-width:720px;margin:auto;background:#fff;padding:16px;border-radius:8px}
+h1,h2{text-align:center}
+input,select,button,textarea{width:100%;padding:8px;margin:6px 0}
+button{background:#000;color:#fff;border:none;cursor:pointer}
+li{list-style:none;border-bottom:1px solid #ddd;padding:8px 0}
+.small{font-size:13px;color:#555}
+.badge{background:#e7ffe7;padding:4px 8px;border-radius:4px;font-size:12px}
+.community{background:#f9f9ff;padding:10px;margin-top:10px}
+.vote{cursor:pointer}
+#revisionBox{display:none;background:#fafafa;padding:10px;margin-top:10px}
+.share{font-size:12px;color:#0077cc;cursor:pointer}
+.readonly{opacity:.8}
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <h1>Colleague</h1>
-<p class="small" style="text-align:center;">
-Speak better. Remember words. Build confidence.
-</p>
-
-🔥 Streak: <b id="streakCount">0</b> days
+<p class="small" style="text-align:center">Version 20 · Share Anything with a Link</p>
+<div class="badge">Free · No Login · Offline · Shareable</div>
 
 <hr>
 
+<!-- MODE -->
 <select id="mode">
   <option value="en-en">English → English</option>
   <option value="en-hi">English → Hindi</option>
-</select>
-
-<select id="level">
-  <option value="easy">Easy</option>
-  <option value="medium">Medium</option>
-  <option value="hard">Hard</option>
-</select>
-
-<select id="job">
-  <option value="general">General</option>
-  <option value="software">Software</option>
-  <option value="sales">Sales</option>
-  <option value="hr">HR</option>
 </select>
 
 <input id="wordInput" placeholder="Enter a word">
@@ -84,22 +45,17 @@ Speak better. Remember words. Build confidence.
 
 <hr>
 
-<select id="filterLevel" onchange="renderWords()">
-  <option value="all">All Levels</option>
-  <option value="easy">Easy</option>
-  <option value="medium">Medium</option>
-  <option value="hard">Hard</option>
-</select>
+🔥 Streak: <b id="streakCount">0</b> days
 
+<h2>Your Words</h2>
+<div class="small">
+  <span class="share" onclick="shareMyList()">🔗 Share my list</span>
+</div>
 <ul id="wordList"></ul>
 
-<div id="dashboard"></div>
-
-<!-- REVISION -->
 <div id="revisionBox">
   <h3 id="revWord"></h3>
-  <div id="revMeaning" style="display:none;"></div>
-  <div id="revExample" style="display:none;"></div>
+  <div id="revMeaning" style="display:none"></div>
   <button onclick="showMeaning()">Show Meaning</button>
   <button onclick="markKnown()">I Know</button>
   <button onclick="markRepeat()">Repeat</button>
@@ -107,69 +63,35 @@ Speak better. Remember words. Build confidence.
 
 <hr>
 
-<!-- PRICING -->
-<h2>Pricing</h2>
-
-<div class="card">
-<b>Free</b>
-<ul>
-<li>Save words</li>
-<li>English + Hindi meanings</li>
-<li>Audio pronunciation</li>
-<li>Revision & streak</li>
-</ul>
+<h2>Community Words</h2>
+<div class="community">
+  <input id="communityWord" placeholder="Community word">
+  <textarea id="communityMeaning" placeholder="Simple meaning"></textarea>
+  <button onclick="addCommunityWord()">Share with Community</button>
 </div>
-
-<div class="card">
-<b>Premium – ₹199 / month</b>
-<ul>
-<li>Job interview packs</li>
-<li>Advanced revision</li>
-<li>Export PDF</li>
-<li>Progress tracking</li>
-</ul>
-
-<div id="paypal-button-container"></div>
-
-<button onclick="manageSubscription()">Manage / Cancel Subscription</button>
-</div>
+<ul id="communityList"></ul>
 
 <hr>
 
-<!-- ENTERPRISE -->
-<h2>Enterprise</h2>
-
-<div class="card">
-<b>For Companies & Institutes</b>
-<p class="small">
-Help candidates speak confidently in interviews without training sessions.
-</p>
-<ul>
-<li>Role-based word packs</li>
-<li>Candidate readiness links</li>
-<li>Progress reports</li>
-</ul>
-<p><b>Contact:</b> ujjwalanurag2110@gmail.com</p>
-</div>
+<h2>Shared Content</h2>
+<div id="sharedBox" class="small"></div>
 
 </div>
-
-<!-- PAYPAL SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id=AQleNjz7Id5HqL7T4ls2uAIHFPvh0HgdtN5B9G6HWZUbj4X_Sy72d9R9goloJ3z0MCIGx8tV7PGdowaN &vault=true&intent=subscription&currency=INR"></script>
 
 <script>
-/* ---------------- DATA ---------------- */
-function getWords(){return JSON.parse(localStorage.getItem("words"))||[]}
-function saveWords(w){localStorage.setItem("words",JSON.stringify(w))}
+/* ---------- STORAGE ---------- */
+const getWords=()=>JSON.parse(localStorage.getItem("words"))||[];
+const saveWords=w=>localStorage.setItem("words",JSON.stringify(w));
+const getCommunity=()=>JSON.parse(localStorage.getItem("community"))||[];
+const saveCommunity=c=>localStorage.setItem("community",JSON.stringify(c));
 
-/* ---------------- FETCH ---------------- */
+/* ---------- FETCH ---------- */
 async function fetchEnglish(word){
   try{
     const r=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
     const d=await r.json();
-    const def=d[0].meanings[0].definitions[0];
-    return {m:def.definition,e:def.example||""};
-  }catch{return {m:"Meaning not found",e:""}}
+    return d[0].meanings[0].definitions[0].definition;
+  }catch{return "Meaning not found"}
 }
 async function fetchHindi(text){
   try{
@@ -179,161 +101,133 @@ async function fetchHindi(text){
   }catch{return "अर्थ नहीं मिला"}
 }
 
-/* ---------------- AUDIO ---------------- */
-function speak(t){
-  let u=new SpeechSynthesisUtterance(t);
-  u.lang="en-US";
-  speechSynthesis.speak(u);
-}
-
-/* ---------------- SAVE ---------------- */
+/* ---------- SAVE ---------- */
 async function saveWord(){
-  const word=wordInput.value.toLowerCase().trim();
+  const word=wordInput.value.trim().toLowerCase();
   if(!word)return;
-
   let words=getWords();
   if(words.find(w=>w.word===word))return;
-
   const en=await fetchEnglish(word);
   let hi="";
-  if(mode.value==="en-hi")hi=await fetchHindi(en.m);
-
-  words.push({
-    word,
-    level:level.value,
-    job:job.value,
-    en:en.m,
-    hi,
-    ex:en.e
-  });
+  if(mode.value==="en-hi")hi=await fetchHindi(en);
+  words.push({word,en,hi});
   saveWords(words);
   wordInput.value="";
   renderWords();
 }
 
-/* ---------------- RENDER ---------------- */
+/* ---------- RENDER ---------- */
 function renderWords(){
   wordList.innerHTML="";
-  const fl=filterLevel.value;
-
-  getWords()
-  .filter(w=>fl==="all"||w.level===fl)
-  .forEach(w=>{
-    const m=mode.value==="en-en"?w.en:(w.hi||"अर्थ नहीं मिला");
+  getWords().forEach(w=>{
+    const m=mode.value==="en-en"?w.en:w.hi;
     const li=document.createElement("li");
     li.innerHTML=`
-      <b>${w.word}</b> (${w.level}, ${w.job})<br>
+      <b>${w.word}</b><br>
       <span class="small">${m}</span><br>
-      <span class="small">${w.ex}</span><br>
-      <button onclick="speak('${w.word}')">🔊</button>
+      <span class="share" onclick="shareWord('${w.word}')">🔗 Share word</span>
     `;
     wordList.appendChild(li);
   });
-
-  renderDashboard();
 }
+renderWords();
 
-/* ---------------- DASHBOARD ---------------- */
-function renderDashboard(){
-  const w=getWords();
-  dashboard.innerHTML=
-    "📊 Words: "+w.length+
-    " | Easy: "+w.filter(x=>x.level==="easy").length+
-    " | Medium: "+w.filter(x=>x.level==="medium").length+
-    " | Hard: "+w.filter(x=>x.level==="hard").length;
-}
-
-/* ---------------- REVISION ---------------- */
+/* ---------- REVISION ---------- */
 let rev=[],i=0;
-function startRevision(){
-  rev=getWords();
-  if(!rev.length)return;
-  i=0;
-  revisionBox.style.display="block";
-  showRev();
-}
-function showRev(){
-  const w=rev[i];
-  revWord.innerText=w.word;
-  revMeaning.innerText=mode.value==="en-en"?w.en:w.hi;
-  revExample.innerText=w.ex;
-  revMeaning.style.display="none";
-  revExample.style.display="none";
-}
-function showMeaning(){
-  revMeaning.style.display="block";
-  revExample.style.display="block";
-}
-function markKnown(){
-  updateStreak();
-  i++;
-  if(i>=rev.length){
-    revisionBox.style.display="none";
-    return;
-  }
-  showRev();
-}
-function markRepeat(){
-  rev.push(rev[i]);
-  i++;
-  showRev();
-}
+function startRevision(){rev=getWords();if(!rev.length)return;i=0;revisionBox.style.display="block";showRev()}
+function showRev(){const w=rev[i];revWord.innerText=w.word;revMeaning.innerText=mode.value==="en-en"?w.en:w.hi;revMeaning.style.display="none"}
+function showMeaning(){revMeaning.style.display="block"}
+function markKnown(){updateStreak();i++;if(i>=rev.length){revisionBox.style.display="none";return}showRev()}
+function markRepeat(){rev.push(rev[i]);i++;showRev()}
 
-/* ---------------- STREAK ---------------- */
-function getStreak(){
-  return JSON.parse(localStorage.getItem("streak"))||{c:0,d:null};
-}
+/* ---------- STREAK ---------- */
+function getStreak(){return JSON.parse(localStorage.getItem("streak"))||{c:0,d:null}}
 function updateStreak(){
-  const t=new Date().toDateString();
-  let s=getStreak();
+  const t=new Date().toDateString();let s=getStreak();
   if(s.d===t)return;
   const y=new Date(Date.now()-86400000).toDateString();
-  s.c=(s.d===y)?s.c+1:1;
-  s.d=t;
+  s.c=(s.d===y)?s.c+1:1;s.d=t;
   localStorage.setItem("streak",JSON.stringify(s));
   streakCount.innerText=s.c;
 }
 streakCount.innerText=getStreak().c;
 
-/* ---------------- EXPORT ---------------- */
+/* ---------- EXPORT ---------- */
 function exportWords(){
-  let txt="";
-  getWords().forEach(w=>{
-    txt+=w.word+"\n"+w.en+"\n\n";
+  let txt="";getWords().forEach(w=>txt+=`${w.word}\n${w.en}\n\n`);
+  const b=new Blob([txt]);const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download="colleague-v20.txt";a.click();
+}
+
+/* ---------- COMMUNITY ---------- */
+function addCommunityWord(){
+  const w=communityWord.value.trim().toLowerCase();
+  const m=communityMeaning.value.trim();
+  if(!w||!m)return;
+  let c=getCommunity();c.push({word:w,meaning:m,votes:0});
+  saveCommunity(c);communityWord.value="";communityMeaning.value="";renderCommunity();
+}
+function vote(i){let c=getCommunity();c[i].votes++;saveCommunity(c);renderCommunity()}
+function renderCommunity(){
+  communityList.innerHTML="";
+  getCommunity().sort((a,b)=>b.votes-a.votes).forEach((c,i)=>{
+    const li=document.createElement("li");
+    li.innerHTML=`
+      <b>${c.word}</b> – ${c.meaning}<br>
+      <span class="vote" onclick="vote(${i})">👍 ${c.votes}</span> ·
+      <span class="share" onclick="shareCommunity('${c.word}','${c.meaning}')">🔗 Share</span>
+    `;
+    communityList.appendChild(li);
   });
-  const b=new Blob([txt]);
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
-  a.download="colleague-words.txt";
-  a.click();
+}
+renderCommunity();
+
+/* ---------- SHARING (URL HASH) ---------- */
+function encode(obj){return btoa(encodeURIComponent(JSON.stringify(obj)))}
+function decode(str){return JSON.parse(decodeURIComponent(atob(str)))}
+
+function shareWord(word){
+  const w=getWords().find(x=>x.word===word);
+  const link=`${location.origin}${location.pathname}#word=${encode(w)}`;
+  navigator.clipboard.writeText(link);
+  alert("Word link copied!");
+}
+function shareMyList(){
+  const link=`${location.origin}${location.pathname}#list=${encode(getWords())}`;
+  navigator.clipboard.writeText(link);
+  alert("List link copied!");
+}
+function shareCommunity(word,meaning){
+  const link=`${location.origin}${location.pathname}#community=${encode({word,meaning})}`;
+  navigator.clipboard.writeText(link);
+  alert("Community link copied!");
 }
 
-/* ---------------- PAYPAL SUBSCRIPTION ---------------- */
-paypal.Buttons({
-  createSubscription:function(data,actions){
-    return actions.subscription.create({
-      plan_id:"YOUR_PLAN_ID"
-    });
-  },
-  onApprove:function(data){
-    alert("Premium activated");
-    localStorage.setItem("premium","true");
-  }
-}).render("#paypal-button-container");
-
-/* ---------------- CANCEL ---------------- */
-function manageSubscription(){
-  window.open("https://www.paypal.com/myaccount/autopay","_blank");
-}
-
-/* ---------------- REMINDER ---------------- */
-if(Notification.permission!=="granted")
-  Notification.requestPermission();
-setTimeout(()=>{
-  new Notification("Colleague Reminder",{body:"Revise 5 words today"});
-},5000);
-
-renderWords();
+/* ---------- IMPORT FROM LINK ---------- */
+(function importFromLink(){
+  if(!location.hash)return;
+  const box=document.getElementById("sharedBox");
+  try{
+    if(location.hash.startsWith("#word=")){
+      const w=decode(location.hash.replace("#word=",""));
+      box.innerHTML=`Shared word: <b>${w.word}</b> — ${w.en}`;
+      if(confirm("Import this word to your list?")){
+        let words=getWords();words.push(w);saveWords(words);renderWords();
+      }
+    }
+    if(location.hash.startsWith("#list=")){
+      const list=decode(location.hash.replace("#list=",""));
+      box.innerHTML=`Shared list (${list.length} words)`;
+      if(confirm("Import this list to your device?")){
+        saveWords(list);renderWords();
+      }
+    }
+    if(location.hash.startsWith("#community=")){
+      const c=decode(location.hash.replace("#community=",""));
+      box.innerHTML=`Community word: <b>${c.word}</b> — ${c.meaning}`;
+    }
+  }catch(e){box.innerHTML="Invalid share link"}
+})();
 </script>
 
 </body>
