@@ -54,32 +54,43 @@
 
 <div class="app">
   <h1>Colleague</h1>
+<select id="mode">
+  <option value="en-en">English → English</option>
+  <option value="en-hi">English → Hindi</option>
+</select>
 
   <input id="wordInput" placeholder="Enter a word" />
   <button onclick="saveWord()">Save Word</button>
 
   <h3>My Words</h3>
-  <ul id="wordList"></ul>
+  <ul id="wordList">
+<button onclick="speakEnglish('${w.word}')">🔊 EN</button>
+<button onclick="speakHindi('${w.hi}')">🔊 HI</button>
+
+  </ul>
 </div>
 
 <script>
-  async function fetchEnglishMeaning(word) {
+  async function fetchEnglish(word) {
     try {
       const res = await fetch(
         `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
       );
       const data = await res.json();
-      return data[0]?.meanings[0]?.definitions[0]?.definition
-        || "Meaning not found";
+      const def = data[0]?.meanings[0]?.definitions[0];
+      return {
+        meaning: def?.definition || "Meaning not found",
+        example: def?.example || "Example not available"
+      };
     } catch {
-      return "Meaning not found";
+      return { meaning: "Meaning not found", example: "" };
     }
   }
 
-  async function fetchHindiMeaning(word) {
+  async function fetchHindi(text) {
     try {
       const res = await fetch(
-        `https://api.mymemory.translated.net/get?q=${word}&langpair=en|hi`
+        `https://api.mymemory.translated.net/get?q=${text}&langpair=en|hi`
       );
       const data = await res.json();
       return data.responseData.translatedText || "अर्थ नहीं मिला";
@@ -88,48 +99,66 @@
     }
   }
 
+  function speak(text) {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    speechSynthesis.speak(u);
+  }
+
   function getWords() {
     return JSON.parse(localStorage.getItem("words")) || [];
   }
 
   async function saveWord() {
-    const input = document.getElementById("wordInput");
-    const word = input.value.toLowerCase().trim();
+    const word = document.getElementById("wordInput").value.toLowerCase().trim();
+    const mode = document.getElementById("mode").value;
     if (!word) return;
 
     const words = getWords();
     if (words.find(w => w.word === word)) return;
 
-    const en = await fetchEnglishMeaning(word);
-    const hi = await fetchHindiMeaning(word);
+    const en = await fetchEnglish(word);
+    let hi = "";
+
+    if (mode === "en-hi") {
+      hi = await fetchHindi(en.meaning);
+    }
 
     words.push({
       word,
-      en,
-      hi,
-      savedAt: Date.now()
+      enMeaning: en.meaning,
+      example: en.example,
+      hiMeaning: hi
     });
 
     localStorage.setItem("words", JSON.stringify(words));
-    input.value = "";
+    document.getElementById("wordInput").value = "";
     renderWords();
   }
 
   function renderWords() {
+    const mode = document.getElementById("mode").value;
     const list = document.getElementById("wordList");
     list.innerHTML = "";
 
     getWords().forEach(w => {
+      let meaning =
+        mode === "en-en"
+          ? w.enMeaning
+          : w.hiMeaning || "अर्थ उपलब्ध नहीं";
+
       const li = document.createElement("li");
       li.innerHTML = `
-        <strong>${w.word}</strong>
-        <div class="meaning">EN: ${w.en}</div>
-        <div class="meaning">HI: ${w.hi}</div>
+        <strong>${w.word}</strong><br>
+        <small><b>Meaning:</b> ${meaning}</small><br>
+        <small><b>Example:</b> ${w.example}</small><br>
+        <button onclick="speak('${w.word}')">🔊 Pronounce</button>
       `;
       list.appendChild(li);
     });
   }
 
+  document.getElementById("mode").addEventListener("change", renderWords);
   renderWords();
 </script>
 
