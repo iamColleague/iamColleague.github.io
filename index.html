@@ -4,21 +4,22 @@
 <meta charset="UTF-8">
 <title>Colleague</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #f4f4f4;
+  background: #f2f2f2;
   margin: 0;
   padding: 15px;
 }
 .app {
-  max-width: 550px;
+  max-width: 600px;
   margin: auto;
   background: white;
   padding: 15px;
   border-radius: 8px;
 }
-h1 { text-align:center; }
+h1, h2 { text-align: center; }
 select, input, button {
   width: 100%;
   padding: 8px;
@@ -34,21 +35,28 @@ li {
   border-bottom: 1px solid #ddd;
   padding: 8px 0;
 }
-.small { font-size: 13px; color:#555; }
-#revisionBox {
-  background:#fafafa;
-  padding:10px;
-  margin-top:10px;
-  display:none;
+.small { font-size: 13px; color: #555; }
+.card {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin: 10px 0;
 }
+#revisionBox { display:none; background:#fafafa; padding:10px; }
 </style>
 </head>
 
 <body>
-<div class="app">
-<h1>Colleague</h1>
 
-<div>🔥 Streak: <span id="streakCount">0</span> days</div>
+<div class="app">
+
+<h1>Colleague</h1>
+<p class="small" style="text-align:center;">
+Speak better. Remember words. Build confidence.
+</p>
+
+🔥 Streak: <b id="streakCount">0</b> days
+
+<hr>
 
 <select id="mode">
   <option value="en-en">English → English</option>
@@ -62,7 +70,7 @@ li {
 </select>
 
 <select id="job">
-  <option value="all">General</option>
+  <option value="general">General</option>
   <option value="software">Software</option>
   <option value="sales">Sales</option>
   <option value="hr">HR</option>
@@ -72,7 +80,9 @@ li {
 <button onclick="saveWord()">Save Word</button>
 
 <button onclick="startRevision()">Start Revision</button>
-<button onclick="exportWords()">Export</button>
+<button onclick="exportWords()">Export Words</button>
+
+<hr>
 
 <select id="filterLevel" onchange="renderWords()">
   <option value="all">All Levels</option>
@@ -85,6 +95,7 @@ li {
 
 <div id="dashboard"></div>
 
+<!-- REVISION -->
 <div id="revisionBox">
   <h3 id="revWord"></h3>
   <div id="revMeaning" style="display:none;"></div>
@@ -94,14 +105,64 @@ li {
   <button onclick="markRepeat()">Repeat</button>
 </div>
 
+<hr>
+
+<!-- PRICING -->
+<h2>Pricing</h2>
+
+<div class="card">
+<b>Free</b>
+<ul>
+<li>Save words</li>
+<li>English + Hindi meanings</li>
+<li>Audio pronunciation</li>
+<li>Revision & streak</li>
+</ul>
 </div>
 
+<div class="card">
+<b>Premium – ₹199 / month</b>
+<ul>
+<li>Job interview packs</li>
+<li>Advanced revision</li>
+<li>Export PDF</li>
+<li>Progress tracking</li>
+</ul>
+
+<div id="paypal-button-container"></div>
+
+<button onclick="manageSubscription()">Manage / Cancel Subscription</button>
+</div>
+
+<hr>
+
+<!-- ENTERPRISE -->
+<h2>Enterprise</h2>
+
+<div class="card">
+<b>For Companies & Institutes</b>
+<p class="small">
+Help candidates speak confidently in interviews without training sessions.
+</p>
+<ul>
+<li>Role-based word packs</li>
+<li>Candidate readiness links</li>
+<li>Progress reports</li>
+</ul>
+<p><b>Contact:</b> business@colleague.app</p>
+</div>
+
+</div>
+
+<!-- PAYPAL SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&vault=true&intent=subscription&currency=INR"></script>
+
 <script>
-/* ---------- UTIL ---------- */
+/* ---------------- DATA ---------------- */
 function getWords(){return JSON.parse(localStorage.getItem("words"))||[]}
 function saveWords(w){localStorage.setItem("words",JSON.stringify(w))}
 
-/* ---------- FETCH ---------- */
+/* ---------------- FETCH ---------------- */
 async function fetchEnglish(word){
   try{
     const r=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
@@ -118,16 +179,18 @@ async function fetchHindi(text){
   }catch{return "अर्थ नहीं मिला"}
 }
 
-/* ---------- AUDIO ---------- */
+/* ---------------- AUDIO ---------------- */
 function speak(t){
   let u=new SpeechSynthesisUtterance(t);
-  u.lang="en-US";speechSynthesis.speak(u);
+  u.lang="en-US";
+  speechSynthesis.speak(u);
 }
 
-/* ---------- SAVE ---------- */
+/* ---------------- SAVE ---------------- */
 async function saveWord(){
   const word=wordInput.value.toLowerCase().trim();
   if(!word)return;
+
   let words=getWords();
   if(words.find(w=>w.word===word))return;
 
@@ -148,36 +211,46 @@ async function saveWord(){
   renderWords();
 }
 
-/* ---------- RENDER ---------- */
+/* ---------------- RENDER ---------------- */
 function renderWords(){
-  const list=wordList;list.innerHTML="";
+  wordList.innerHTML="";
   const fl=filterLevel.value;
-  getWords().filter(w=>fl==="all"||w.level===fl).forEach(w=>{
+
+  getWords()
+  .filter(w=>fl==="all"||w.level===fl)
+  .forEach(w=>{
     const m=mode.value==="en-en"?w.en:(w.hi||"अर्थ नहीं मिला");
     const li=document.createElement("li");
-    li.innerHTML=`<b>${w.word}</b> (${w.level}, ${w.job})<br>
-    <span class="small">${m}</span><br>
-    <span class="small">${w.ex}</span><br>
-    <button onclick="speak('${w.word}')">🔊</button>`;
-    list.appendChild(li);
+    li.innerHTML=`
+      <b>${w.word}</b> (${w.level}, ${w.job})<br>
+      <span class="small">${m}</span><br>
+      <span class="small">${w.ex}</span><br>
+      <button onclick="speak('${w.word}')">🔊</button>
+    `;
+    wordList.appendChild(li);
   });
+
   renderDashboard();
 }
 
-/* ---------- DASHBOARD ---------- */
+/* ---------------- DASHBOARD ---------------- */
 function renderDashboard(){
   const w=getWords();
-  dashboard.innerHTML=`📊 Words: ${w.length} |
-  Easy:${w.filter(x=>x.level==="easy").length} |
-  Medium:${w.filter(x=>x.level==="medium").length} |
-  Hard:${w.filter(x=>x.level==="hard").length}`;
+  dashboard.innerHTML=
+    "📊 Words: "+w.length+
+    " | Easy: "+w.filter(x=>x.level==="easy").length+
+    " | Medium: "+w.filter(x=>x.level==="medium").length+
+    " | Hard: "+w.filter(x=>x.level==="hard").length;
 }
 
-/* ---------- REVISION ---------- */
+/* ---------------- REVISION ---------------- */
 let rev=[],i=0;
 function startRevision(){
-  rev=getWords();if(!rev.length)return;
-  i=0;revisionBox.style.display="block";showRev();
+  rev=getWords();
+  if(!rev.length)return;
+  i=0;
+  revisionBox.style.display="block";
+  showRev();
 }
 function showRev(){
   const w=rev[i];
@@ -193,13 +266,23 @@ function showMeaning(){
 }
 function markKnown(){
   updateStreak();
-  i++;if(i>=rev.length){revisionBox.style.display="none";return}
+  i++;
+  if(i>=rev.length){
+    revisionBox.style.display="none";
+    return;
+  }
   showRev();
 }
-function markRepeat(){rev.push(rev[i]);i++;showRev();}
+function markRepeat(){
+  rev.push(rev[i]);
+  i++;
+  showRev();
+}
 
-/* ---------- STREAK ---------- */
-function getStreak(){return JSON.parse(localStorage.getItem("streak"))||{c:0,d:null}}
+/* ---------------- STREAK ---------------- */
+function getStreak(){
+  return JSON.parse(localStorage.getItem("streak"))||{c:0,d:null};
+}
 function updateStreak(){
   const t=new Date().toDateString();
   let s=getStreak();
@@ -212,18 +295,38 @@ function updateStreak(){
 }
 streakCount.innerText=getStreak().c;
 
-/* ---------- EXPORT ---------- */
+/* ---------------- EXPORT ---------------- */
 function exportWords(){
   let txt="";
-  getWords().forEach(w=>txt+=`${w.word}\n${w.en}\n\n`);
+  getWords().forEach(w=>{
+    txt+=w.word+"\n"+w.en+"\n\n";
+  });
   const b=new Blob([txt]);
   const a=document.createElement("a");
   a.href=URL.createObjectURL(b);
-  a.download="colleague.txt";
+  a.download="colleague-words.txt";
   a.click();
 }
 
-/* ---------- REMINDER ---------- */
+/* ---------------- PAYPAL SUBSCRIPTION ---------------- */
+paypal.Buttons({
+  createSubscription:function(data,actions){
+    return actions.subscription.create({
+      plan_id:"YOUR_PLAN_ID"
+    });
+  },
+  onApprove:function(data){
+    alert("Premium activated");
+    localStorage.setItem("premium","true");
+  }
+}).render("#paypal-button-container");
+
+/* ---------------- CANCEL ---------------- */
+function manageSubscription(){
+  window.open("https://www.paypal.com/myaccount/autopay","_blank");
+}
+
+/* ---------------- REMINDER ---------------- */
 if(Notification.permission!=="granted")
   Notification.requestPermission();
 setTimeout(()=>{
@@ -232,5 +335,6 @@ setTimeout(()=>{
 
 renderWords();
 </script>
+
 </body>
 </html>
