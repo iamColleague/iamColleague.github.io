@@ -2,23 +2,94 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Colleague v2.0</title>
+<title>Colleague v100</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:16px}
-.app{max-width:720px;margin:auto;background:#fff;padding:16px;border-radius:8px}
-h1,h2{text-align:center}
-input,select,button,textarea{width:100%;padding:8px;margin:6px 0}
-button{background:#000;color:#fff;border:none;cursor:pointer}
-li{list-style:none;border-bottom:1px solid #ddd;padding:8px 0}
-.small{font-size:13px;color:#555}
-.badge{background:#e7ffe7;padding:4px 8px;border-radius:4px;font-size:12px}
-.community{background:#f9f9ff;padding:10px;margin-top:10px}
-.vote{cursor:pointer}
-#revisionBox{display:none;background:#fafafa;padding:10px;margin-top:10px}
-.share{font-size:12px;color:#0077cc;cursor:pointer}
-.readonly{opacity:.8}
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 16px;
+}
+.app {
+  max-width: 760px;
+  margin: auto;
+  background: #fff;
+  padding: 18px;
+  border-radius: 10px;
+}
+h1, h2 {
+  text-align: center;
+  margin-bottom: 4px;
+}
+p.tagline {
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+.badge {
+  display: inline-block;
+  background: #e8f5e9;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin: 6px auto;
+}
+input, select, textarea, button {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  font-size: 15px;
+}
+button {
+  background: #000;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+button.secondary {
+  background: #f0f0f0;
+  color: #000;
+}
+li {
+  list-style: none;
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+}
+.small {
+  font-size: 13px;
+  color: #666;
+}
+.share {
+  font-size: 13px;
+  color: #0066cc;
+  cursor: pointer;
+}
+.section {
+  margin-top: 22px;
+}
+.community {
+  background: #fafbff;
+  padding: 12px;
+  border-radius: 6px;
+}
+.vote {
+  cursor: pointer;
+}
+#revisionBox {
+  display: none;
+  background: #fafafa;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+}
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: #777;
+  margin-top: 30px;
+}
 </style>
 </head>
 
@@ -26,103 +97,112 @@ li{list-style:none;border-bottom:1px solid #ddd;padding:8px 0}
 <div class="app">
 
 <h1>Colleague</h1>
-<p class="small" style="text-align:center">Version 20 · Share Anything with a Link</p>
-<div class="badge">Free · No Login · Offline · Shareable</div>
+<p class="tagline">Remember words. Speak with confidence.</p>
+<div class="badge">Version 100 · Free · Offline · No Login</div>
 
-<hr>
-
-<!-- MODE -->
+<div class="section">
 <select id="mode">
   <option value="en-en">English → English</option>
   <option value="en-hi">English → Hindi</option>
 </select>
 
-<input id="wordInput" placeholder="Enter a word">
+<input id="wordInput" placeholder="Enter a word you want to remember">
 <button onclick="saveWord()">Save Word</button>
 
-<button onclick="startRevision()">Start Revision</button>
-<button onclick="exportWords()">Export Words</button>
-
-<hr>
-
-🔥 Streak: <b id="streakCount">0</b> days
-
-<h2>Your Words</h2>
-<div class="small">
-  <span class="share" onclick="shareMyList()">🔗 Share my list</span>
+<button class="secondary" onclick="startRevision()">Start Revision</button>
+<button class="secondary" onclick="exportWords()">Export Words</button>
 </div>
+
+<div class="section">
+🔥 Streak: <b id="streakCount">0</b> days
+</div>
+
+<div class="section">
+<h2>Your Words</h2>
+<div class="small"><span class="share" onclick="shareMyList()">🔗 Share your list</span></div>
 <ul id="wordList"></ul>
+</div>
 
 <div id="revisionBox">
   <h3 id="revWord"></h3>
-  <div id="revMeaning" style="display:none"></div>
+  <div id="revMeaning" style="display:none;"></div>
   <button onclick="showMeaning()">Show Meaning</button>
   <button onclick="markKnown()">I Know</button>
   <button onclick="markRepeat()">Repeat</button>
 </div>
 
-<hr>
-
+<div class="section">
 <h2>Community Words</h2>
 <div class="community">
-  <input id="communityWord" placeholder="Community word">
-  <textarea id="communityMeaning" placeholder="Simple meaning"></textarea>
-  <button onclick="addCommunityWord()">Share with Community</button>
+<input id="communityWord" placeholder="Community word">
+<textarea id="communityMeaning" placeholder="Simple meaning (in your own words)"></textarea>
+<button onclick="addCommunityWord()">Share with Community</button>
 </div>
 <ul id="communityList"></ul>
+</div>
 
-<hr>
-
+<div class="section">
 <h2>Shared Content</h2>
 <div id="sharedBox" class="small"></div>
+</div>
+
+<div class="footer">
+Colleague v100 · Built for confidence · Share freely
+</div>
 
 </div>
 
 <script>
 /* ---------- STORAGE ---------- */
-const getWords=()=>JSON.parse(localStorage.getItem("words"))||[];
-const saveWords=w=>localStorage.setItem("words",JSON.stringify(w));
-const getCommunity=()=>JSON.parse(localStorage.getItem("community"))||[];
-const saveCommunity=c=>localStorage.setItem("community",JSON.stringify(c));
+const getWords = () => JSON.parse(localStorage.getItem("words")) || [];
+const saveWords = w => localStorage.setItem("words", JSON.stringify(w));
+const getCommunity = () => JSON.parse(localStorage.getItem("community")) || [];
+const saveCommunity = c => localStorage.setItem("community", JSON.stringify(c));
 
 /* ---------- FETCH ---------- */
-async function fetchEnglish(word){
-  try{
-    const r=await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-    const d=await r.json();
+async function fetchEnglish(word) {
+  try {
+    const r = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+    const d = await r.json();
     return d[0].meanings[0].definitions[0].definition;
-  }catch{return "Meaning not found"}
+  } catch {
+    return "Meaning not found";
+  }
 }
-async function fetchHindi(text){
-  try{
-    const r=await fetch(`https://api.mymemory.translated.net/get?q=${text}&langpair=en|hi`);
-    const d=await r.json();
+async function fetchHindi(text) {
+  try {
+    const r = await fetch(`https://api.mymemory.translated.net/get?q=${text}&langpair=en|hi`);
+    const d = await r.json();
     return d.responseData.translatedText;
-  }catch{return "अर्थ नहीं मिला"}
+  } catch {
+    return "अर्थ नहीं मिला";
+  }
 }
 
-/* ---------- SAVE ---------- */
-async function saveWord(){
-  const word=wordInput.value.trim().toLowerCase();
-  if(!word)return;
-  let words=getWords();
-  if(words.find(w=>w.word===word))return;
-  const en=await fetchEnglish(word);
-  let hi="";
-  if(mode.value==="en-hi")hi=await fetchHindi(en);
-  words.push({word,en,hi});
+/* ---------- SAVE WORD ---------- */
+async function saveWord() {
+  const word = wordInput.value.trim().toLowerCase();
+  if (!word) return;
+  let words = getWords();
+  if (words.find(w => w.word === word)) return;
+
+  const en = await fetchEnglish(word);
+  let hi = "";
+  if (mode.value === "en-hi") hi = await fetchHindi(en);
+
+  words.push({ word, en, hi });
   saveWords(words);
-  wordInput.value="";
+  wordInput.value = "";
   renderWords();
 }
 
-/* ---------- RENDER ---------- */
-function renderWords(){
-  wordList.innerHTML="";
-  getWords().forEach(w=>{
-    const m=mode.value==="en-en"?w.en:w.hi;
-    const li=document.createElement("li");
-    li.innerHTML=`
+/* ---------- RENDER WORDS ---------- */
+function renderWords() {
+  wordList.innerHTML = "";
+  getWords().forEach(w => {
+    const m = mode.value === "en-en" ? w.en : w.hi;
+    const li = document.createElement("li");
+    li.innerHTML = `
       <b>${w.word}</b><br>
       <span class="small">${m}</span><br>
       <span class="share" onclick="shareWord('${w.word}')">🔗 Share word</span>
@@ -133,47 +213,83 @@ function renderWords(){
 renderWords();
 
 /* ---------- REVISION ---------- */
-let rev=[],i=0;
-function startRevision(){rev=getWords();if(!rev.length)return;i=0;revisionBox.style.display="block";showRev()}
-function showRev(){const w=rev[i];revWord.innerText=w.word;revMeaning.innerText=mode.value==="en-en"?w.en:w.hi;revMeaning.style.display="none"}
-function showMeaning(){revMeaning.style.display="block"}
-function markKnown(){updateStreak();i++;if(i>=rev.length){revisionBox.style.display="none";return}showRev()}
-function markRepeat(){rev.push(rev[i]);i++;showRev()}
+let rev = [], idx = 0;
+function startRevision() {
+  rev = getWords();
+  if (!rev.length) return;
+  idx = 0;
+  revisionBox.style.display = "block";
+  showRev();
+}
+function showRev() {
+  const w = rev[idx];
+  revWord.innerText = w.word;
+  revMeaning.innerText = mode.value === "en-en" ? w.en : w.hi;
+  revMeaning.style.display = "none";
+}
+function showMeaning() { revMeaning.style.display = "block"; }
+function markKnown() {
+  updateStreak();
+  idx++;
+  if (idx >= rev.length) {
+    revisionBox.style.display = "none";
+    return;
+  }
+  showRev();
+}
+function markRepeat() { rev.push(rev[idx]); idx++; showRev(); }
 
 /* ---------- STREAK ---------- */
-function getStreak(){return JSON.parse(localStorage.getItem("streak"))||{c:0,d:null}}
-function updateStreak(){
-  const t=new Date().toDateString();let s=getStreak();
-  if(s.d===t)return;
-  const y=new Date(Date.now()-86400000).toDateString();
-  s.c=(s.d===y)?s.c+1:1;s.d=t;
-  localStorage.setItem("streak",JSON.stringify(s));
-  streakCount.innerText=s.c;
+function getStreak() {
+  return JSON.parse(localStorage.getItem("streak")) || { c: 0, d: null };
 }
-streakCount.innerText=getStreak().c;
+function updateStreak() {
+  const t = new Date().toDateString();
+  let s = getStreak();
+  if (s.d === t) return;
+  const y = new Date(Date.now() - 86400000).toDateString();
+  s.c = (s.d === y) ? s.c + 1 : 1;
+  s.d = t;
+  localStorage.setItem("streak", JSON.stringify(s));
+  streakCount.innerText = s.c;
+}
+streakCount.innerText = getStreak().c;
 
 /* ---------- EXPORT ---------- */
-function exportWords(){
-  let txt="";getWords().forEach(w=>txt+=`${w.word}\n${w.en}\n\n`);
-  const b=new Blob([txt]);const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);a.download="colleague-v20.txt";a.click();
+function exportWords() {
+  let txt = "";
+  getWords().forEach(w => txt += `${w.word}\n${w.en}\n\n`);
+  const b = new Blob([txt]);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(b);
+  a.download = "colleague-v100.txt";
+  a.click();
 }
 
 /* ---------- COMMUNITY ---------- */
-function addCommunityWord(){
-  const w=communityWord.value.trim().toLowerCase();
-  const m=communityMeaning.value.trim();
-  if(!w||!m)return;
-  let c=getCommunity();c.push({word:w,meaning:m,votes:0});
-  saveCommunity(c);communityWord.value="";communityMeaning.value="";renderCommunity();
+function addCommunityWord() {
+  const w = communityWord.value.trim().toLowerCase();
+  const m = communityMeaning.value.trim();
+  if (!w || !m) return;
+  let c = getCommunity();
+  c.push({ word: w, meaning: m, votes: 0 });
+  saveCommunity(c);
+  communityWord.value = "";
+  communityMeaning.value = "";
+  renderCommunity();
 }
-function vote(i){let c=getCommunity();c[i].votes++;saveCommunity(c);renderCommunity()}
-function renderCommunity(){
-  communityList.innerHTML="";
+function vote(i) {
+  let c = getCommunity();
+  c[i].votes++;
+  saveCommunity(c);
+  renderCommunity();
+}
+function renderCommunity() {
+  communityList.innerHTML = "";
   getCommunity().sort((a,b)=>b.votes-a.votes).forEach((c,i)=>{
     const li=document.createElement("li");
     li.innerHTML=`
-      <b>${c.word}</b> – ${c.meaning}<br>
+      <b>${c.word}</b> — ${c.meaning}<br>
       <span class="vote" onclick="vote(${i})">👍 ${c.votes}</span> ·
       <span class="share" onclick="shareCommunity('${c.word}','${c.meaning}')">🔗 Share</span>
     `;
@@ -182,53 +298,51 @@ function renderCommunity(){
 }
 renderCommunity();
 
-/* ---------- SHARING (URL HASH) ---------- */
-function encode(obj){return btoa(encodeURIComponent(JSON.stringify(obj)))}
-function decode(str){return JSON.parse(decodeURIComponent(atob(str)))}
+/* ---------- SHARING ---------- */
+function encode(o){return btoa(encodeURIComponent(JSON.stringify(o)))}
+function decode(s){return JSON.parse(decodeURIComponent(atob(s)))}
 
 function shareWord(word){
   const w=getWords().find(x=>x.word===word);
   const link=`${location.origin}${location.pathname}#word=${encode(w)}`;
   navigator.clipboard.writeText(link);
-  alert("Word link copied!");
+  alert("Word link copied");
 }
 function shareMyList(){
   const link=`${location.origin}${location.pathname}#list=${encode(getWords())}`;
   navigator.clipboard.writeText(link);
-  alert("List link copied!");
+  alert("List link copied");
 }
-function shareCommunity(word,meaning){
-  const link=`${location.origin}${location.pathname}#community=${encode({word,meaning})}`;
+function shareCommunity(w,m){
+  const link=`${location.origin}${location.pathname}#community=${encode({word:w,meaning:m})}`;
   navigator.clipboard.writeText(link);
-  alert("Community link copied!");
+  alert("Community link copied");
 }
 
-/* ---------- IMPORT FROM LINK ---------- */
-(function importFromLink(){
+/* ---------- IMPORT ---------- */
+(function(){
   if(!location.hash)return;
-  const box=document.getElementById("sharedBox");
   try{
     if(location.hash.startsWith("#word=")){
       const w=decode(location.hash.replace("#word=",""));
-      box.innerHTML=`Shared word: <b>${w.word}</b> — ${w.en}`;
-      if(confirm("Import this word to your list?")){
+      sharedBox.innerHTML=`Shared word: <b>${w.word}</b>`;
+      if(confirm("Import this word?")){
         let words=getWords();words.push(w);saveWords(words);renderWords();
       }
     }
     if(location.hash.startsWith("#list=")){
-      const list=decode(location.hash.replace("#list=",""));
-      box.innerHTML=`Shared list (${list.length} words)`;
-      if(confirm("Import this list to your device?")){
-        saveWords(list);renderWords();
+      const l=decode(location.hash.replace("#list=",""));
+      sharedBox.innerHTML=`Shared list (${l.length} words)`;
+      if(confirm("Import this list?")){
+        saveWords(l);renderWords();
       }
     }
     if(location.hash.startsWith("#community=")){
       const c=decode(location.hash.replace("#community=",""));
-      box.innerHTML=`Community word: <b>${c.word}</b> — ${c.meaning}`;
+      sharedBox.innerHTML=`Community word: <b>${c.word}</b> — ${c.meaning}`;
     }
-  }catch(e){box.innerHTML="Invalid share link"}
+  }catch{sharedBox.innerHTML="Invalid share link"}
 })();
 </script>
-
 </body>
 </html>
