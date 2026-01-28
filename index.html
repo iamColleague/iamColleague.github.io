@@ -63,11 +63,23 @@
 </div>
 
 <script>
-  const meanings = {
-    responsible: "Having a duty or job to do",
-    handled: "Managed or dealt with",
-    improved: "Made something better",
-    confident: "Sure of yourself"
+  const dictionary = {
+    responsible: {
+      en: "Having a duty or job to do",
+      hi: "जिम्मेदारी वाला"
+    },
+    handled: {
+      en: "Managed or dealt with",
+      hi: "संभाला"
+    },
+    improved: {
+      en: "Made something better",
+      hi: "सुधार किया"
+    },
+    confident: {
+      en: "Sure of yourself",
+      hi: "आत्मविश्वासी"
+    }
   };
 
   function getWords() {
@@ -80,14 +92,17 @@
     if (!word) return;
 
     const words = getWords();
+
     if (!words.find(w => w.word === word)) {
       words.push({
         word,
-        meaning: meanings[word] || "Meaning will come with practice",
+        en: dictionary[word]?.en || "Meaning will come with practice",
+        hi: dictionary[word]?.hi || "अर्थ अभ्यास से आएगा",
         savedAt: Date.now()
       });
       localStorage.setItem("words", JSON.stringify(words));
     }
+
     input.value = "";
     renderWords();
   }
@@ -95,10 +110,14 @@
   function renderWords() {
     const list = document.getElementById("wordList");
     list.innerHTML = "";
+
     getWords().forEach(w => {
       const li = document.createElement("li");
-      li.innerHTML = `<strong>${w.word}</strong>
-        <div class="meaning">${w.meaning}</div>`;
+      li.innerHTML = `
+        <strong>${w.word}</strong>
+        <div class="meaning">EN: ${w.en}</div>
+        <div class="meaning">HI: ${w.hi}</div>
+      `;
       list.appendChild(li);
     });
   }
