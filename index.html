@@ -1,29 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Colleague – Remember the Right Words</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Colleague</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <header>
-    <h1>Colleague</h1>
-    <p>Remember the right words when it matters.</p>
-  </header>
+  <h1>Colleague</h1>
+  <p>Remember the right words at the right time.</p>
 
-  <main>
-    <section class="word-box">
-      <input id="wordInput" placeholder="Enter a word" />
-      <button onclick="addWord()">Save Word</button>
-    </section>
+  <input id="search" placeholder="Search a word">
+  <button onclick="searchWord()">Search</button>
 
-    <section class="list">
-      <h2>My Words</h2>
-      <ul id="wordList"></ul>
-    </section>
-  </main>
-
-  <script src="app.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
