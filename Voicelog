@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VoiceLog – Enterprise Reflection Tool</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+  }
+  header {
+    background: #0b3c5d;
+    color: #fff;
+    padding: 15px;
+    text-align: center;
+  }
+  .container {
+    max-width: 700px;
+    margin: auto;
+    padding: 20px;
+  }
+  .card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  button {
+    padding: 10px 15px;
+    background: #0b3c5d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  textarea {
+    width: 100%;
+    height: 80px;
+    margin-top: 10px;
+  }
+  .blog {
+    border-left: 4px solid #0b3c5d;
+    padding-left: 10px;
+    margin-top: 10px;
+  }
+  small {
+    color: gray;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h2>🎙️ VoiceLog</h2>
+  <p>Enterprise Voice-to-Reflection Platform</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h3>Speak freely (Hindi / English)</h3>
+    <p>Just talk. No writing needed.</p>
+
+    <button onclick="startVoice()">🎤 Start Speaking</button>
+    <textarea id="voiceText" placeholder="Your voice will appear here..."></textarea>
+
+    <br><br>
+    <button onclick="publish()">Publish Reflection</button>
+  </div>
+
+  <div class="card">
+    <h3>📊 Team Reflections</h3>
+    <div id="feed"></div>
+  </div>
+
+</div>
+
+<script>
+let reflections = JSON.parse(localStorage.getItem("reflections")) || [];
+let recognition;
+
+function startVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = "hi-IN"; // Hindi (handles Hinglish too)
+  recognition.interimResults = false;
+
+  recognition.onresult = function(event) {
+    document.getElementById("voiceText").value =
+      event.results[0][0].transcript;
+  };
+
+  recognition.start();
+}
+
+function publish() {
+  const text = document.getElementById("voiceText").value.trim();
+  if (!text) {
+    alert("Please speak something 🙂");
+    return;
+  }
+
+  const reflection = {
+    date: new Date().toLocaleString(),
+    content: `
+      Today I would like to share something.
+      <br><br>
+      ${text}
+      <br><br>
+      This reflection captures my experience and thoughts.
+    `
+  };
+
+  reflections.unshift(reflection);
+  localStorage.setItem("reflections", JSON.stringify(reflections));
+
+  document.getElementById("voiceText").value = "";
+  render();
+}
+
+function render() {
+  const feed = document.getElementById("feed");
+  feed.innerHTML = "";
+
+  reflections.forEach(r => {
+    feed.innerHTML += `
+      <div class="blog">
+        <small>${r.date}</small>
+        <p>${r.content}</p>
+      </div>
+    `;
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
