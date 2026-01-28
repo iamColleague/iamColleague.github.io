@@ -1,39 +1,110 @@
-let words = JSON.parse(localStorage.getItem("colleagueWords")) || [];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Colleague – Remember Words</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    margin: 0;
+    padding: 20px;
+  }
+  .app {
+    max-width: 500px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  h1 {
+    text-align: center;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+  }
+  button {
+    padding: 10px;
+    margin-top: 10px;
+    width: 100%;
+    background: black;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  li {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+  }
+  .meaning {
+    font-size: 14px;
+    color: #555;
+  }
+</style>
+</head>
 
-function addWord() {
-  const input = document.getElementById("wordInput");
-  const word = input.value.trim();
+<body>
 
-  if (!word) return;
+<div class="app">
+  <h1>Colleague</h1>
 
-  words.push({
-    text: word,
-    savedAt: new Date().toISOString()
-  });
+  <input id="wordInput" placeholder="Enter a word" />
+  <button onclick="saveWord()">Save Word</button>
 
-  localStorage.setItem("colleagueWords", JSON.stringify(words));
-  input.value = "";
+  <h3>My Words</h3>
+  <ul id="wordList"></ul>
+</div>
+
+<script>
+  const meanings = {
+    responsible: "Having a duty or job to do",
+    handled: "Managed or dealt with",
+    improved: "Made something better",
+    confident: "Sure of yourself"
+  };
+
+  function getWords() {
+    return JSON.parse(localStorage.getItem("words")) || [];
+  }
+
+  function saveWord() {
+    const input = document.getElementById("wordInput");
+    const word = input.value.toLowerCase().trim();
+    if (!word) return;
+
+    const words = getWords();
+    if (!words.find(w => w.word === word)) {
+      words.push({
+        word,
+        meaning: meanings[word] || "Meaning will come with practice",
+        savedAt: Date.now()
+      });
+      localStorage.setItem("words", JSON.stringify(words));
+    }
+    input.value = "";
+    renderWords();
+  }
+
+  function renderWords() {
+    const list = document.getElementById("wordList");
+    list.innerHTML = "";
+    getWords().forEach(w => {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${w.word}</strong>
+        <div class="meaning">${w.meaning}</div>`;
+      list.appendChild(li);
+    });
+  }
+
   renderWords();
-}
+</script>
 
-function renderWords() {
-  const list = document.getElementById("wordList");
-  list.innerHTML = "";
-
-  words.forEach((w, i) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <span>${w.text}</span>
-      <button onclick="removeWord(${i})">×</button>
-    `;
-    list.appendChild(li);
-  });
-}
-
-function removeWord(index) {
-  words.splice(index, 1);
-  localStorage.setItem("colleagueWords", JSON.stringify(words));
-  renderWords();
-}
-
-renderWords();
+</body>
+</html>
